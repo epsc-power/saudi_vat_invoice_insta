@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_vat_b2b" model="report.paperformat">
+            <field name="name">VAT INVOICE FORMAT</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">2</field>      <!-- space reserved for header -->
+            <field name="margin_bottom">25</field>   <!-- space reserved for footer -->
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">2</field>  <!-- must match margin_top -->
+            <field name="dpi">90</field>
+        </record>
+        <report
+                id="account_invoices"
+                model="account.move"
+                string="Saudi E-Invoice (B2B)"
+                report_type="qweb-pdf"
+                name="saudi_vat_invoice_insta.report_saudi_invoice_pdt"
+                file="saudi_vat_invoice_insta.report_saudi_invoice_pdt"
+                paperformat="saudi_vat_invoice_insta.paperformat_vat_b2b"
+        />
+        <record id="report_saudi_invoice" model="ir.actions.report">
+            <field name="name">Saudi Invoice Print</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">saudi_vat_invoice_insta.report_saudi_invoice_pdt</field>
+            <field name="report_file">saudi_vat_invoice_insta.report_saudi_invoice_pdt</field>
+            <field name="print_report_name">'VAT INVOICE - %s - %s' % (object.partner_id.name or '', object.name)
+            </field>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="paperformat_id" ref="saudi_vat_invoice_insta.paperformat_vat_b2b"/>
+            <field name="binding_type">report</field>
+        </record>
+        <template id="report_saudi_invoice_pdt">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="saudi_vat_invoice_insta.report_saudi_invoice_print_b2b" t-lang="doc.partner_id.lang"/>
+            </t>
+        </template>
+        <template id="report_saudi_invoice_print_b2b">
+            <t t-call="web.html_container">
+                <t t-set="o" t-value="doc"/>
+                <t t-call="saudi_vat_invoice_insta.external_layout_vat">
+                    <div style="width:100%; text-align:center; margin-bottom:8px;">
+                        <t t-if="doc.company_id.header_img">
+                            <img t-attf-src="/web/image/res.company/{{ doc.company_id.id }}/header_img"
+                                 style="width:100%; height:auto; max-height:120px; display:block;"/>
+                        </t>
+                    </div>
+                    <div class="page" style="font-family: 'Cairo';font-size: 11px; !important">
+                        <div class="row">
+                        <!-- LEFT: Invoice Number, Invoice Date, Delivery Date -->
+                        <div class="col-4">
+                            <table width="100%" style="table-layout:fixed;border-collapse:collapse;" class="table-borderless">
+                                <tr>
+                                    <td style="padding: 5px;" class="text-left">
+                                        <t t-if="doc.move_type == 'out_invoice'">Invoice Number :</t>
+                                        <t t-if="doc.move_type == 'out_refund'">Credit Note Number :</t>
+                                    </td>
+                                    <td style="padding: 5px;" class="text-center">
+                                        <span t-field="doc.name"/>
+                                    </td>
+                                    <td style="padding: 5px;" class="text-right">
+                                        <t t-if="doc.move_type == 'out_invoice'">: رقم الفاتورة</t>
+                                        <t t-if="doc.move_type == 'out_refund'">: رقم الإشعار</t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px;" class="text-left">
+                                        <t t-if="doc.move_type == 'out_invoice'">Invoice Date :</t>
+                                        <t t-if="doc.move_type == 'out_refund'">Credit Note Date :</t>
+                                    </td>
+                                    <td style="padding: 5px;" class="text-center">
+                                        <span t-field="doc.invoice_date"/>
+                                    </td>
+                                    <td style="padding: 5px;" class="text-right">
+                                        <t t-if="doc.move_type == 'out_invoice'">: تاريخ الفاتورة</t>
+                                        <t t-if="doc.move_type == 'out_refund'">: تاريخ الإشعار</t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px;" class="text-left">Delivery Date :</td>
+                                    <td style="padding: 5px;" class="text-center">
+                                        <b><span t-field="doc.delivery_date"/></b>
+                                    </td>
+                                    <td style="padding: 5px;" class="text-right">: تاريخ التوريد</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- MIDDLE: Due Date, PO Number -->
+                        <div class="col-3">
+                            <table width="100%" style="table-layout:fixed;border-collapse:collapse;" class="table-borderless">
+                                <tr>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-left">Due Date :</td>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-center">
+                                        <span t-field="doc.invoice_date_due"/>
+                                    </td>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-right">: تاريخ الاستحقاق</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-left">PO Number :</td>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-center">
+                                        <b><span t-field="doc.contract_no"/></b>
+                                    </td>
+                                    <td style="padding: 5px; white-space: nowrap; font-size:10px;" class="text-right">: رقم طلب الشراء</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- QR CODE -->
+                        <div class="col-2 pull-right">
+                            <table width="100%" class="table-borderless">
+                                <tr>
+                                    <td class="text-right">
+                                        <img t-att-src="'/report/barcode/?barcode_type=QR&amp;width=400&amp;height=400&amp;value=' + doc.generate_tlv_code()"
+                                             style="max-height:80px; float: right"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- TITLE: Tax Invoice / Credit Note -->
+                        <div class="col-3 pull-right">
+                            <table width="100%" class="table-borderless" style="padding: 5px;">
+                                <tr>
+                                    <td class="text-center">
+                                        <h3>
+                                            <span t-if="doc.move_type == 'out_invoice' and doc.state in ['draft','open','posted']">
+                                                الفاتورة الضريبية<br/>Tax INVOICE
+                                            </span>
+                                            <span t-if="doc.move_type == 'out_refund'">
+                                                إشعار دائن<br/>CREDIT NOTE
+                                            </span>
+                                        </h3>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                        <div style="height:15px;"></div>
+                        <div style="border: 1px solid black; border-radius: 10px; overflow: hidden; width: 100%;">
+                            <table width="100%" style="border-collapse: collapse; table-layout: fixed;">
+                                <tr>
+                                    <td colspan="3" class="text-center" style="background-color:#cc0000; color:white; font-weight:bold; border-bottom: 1px solid black; border-right: 1px solid black; padding: 5px;">
+                                        SELLER
+                                    </td>
+                                    <td class="text-center" colspan="3" style="background-color:#cc0000; color:white; font-weight:bold; border-bottom: 1px solid black; padding: 5px;">
+                                        BUYER
+                                    </td>
+                                </tr>
+                                <tr style="height:5px;">
+                                    <td style="width: 15%; padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Name :</td>
+                                    <td style="width: 25%; padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.name"/><t t-if="doc.company_id.arabic"><br/><span t-field="doc.company_id.arabic"/></t></td>
+                                    <td style="width: 10%; padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: اسم</td>
+
+                                    <td style="width: 15%; padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Name :</td>
+                                    <td style="width: 25%; padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.name"/><br/><span t-field="doc.partner_id.arabic"/></td>
+                                    <td style="width: 10%; padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: اسم</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Building No. :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.street"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: رقم المبني</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Building No. :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.street"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: رقم المبني</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Street Name :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.street2"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: اسم الشارع</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Street Name :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.street2"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: اسم الشارع</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">District :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.district"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: المنطقة</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">District :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.district"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: المنطقة</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">City :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.city"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: المدينة</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">City :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.city"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: المدينة</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Country :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.country_id"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: الدوله</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Country :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.country_id"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: الدوله</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">P.O. Box :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.zip"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: رمز بريدي</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">P.O. Box :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.zip"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: رمز بريدي</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Additional No :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.additional_no"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: رقم إضافي</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">Additional No :</td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.additional_no"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: رقم إضافي</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px; border-right: 1px solid #ccc;">VAT ID :</td>
+                                    <td style="padding: 5px; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.vat"/></td>
+                                    <td style="padding: 5px; border-right: 1px solid black; text-align: right;">: الرقم الضريبي</td>
+                                    <td style="padding: 5px; border-right: 1px solid #ccc;">VAT ID :</td>
+                                    <td style="padding: 5px; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.vat"/></td>
+                                    <td style="padding: 5px; text-align: right;">: الرقم الضريبي</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                        <table class="table-borderless" width="100%" style="border-spacing: 1em .5em;padding: 0 2em 1em 0;">
+                            <thead>
+                                <tr >
+                                    <th width="3%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        #
+                                    </th>
+                                    <th width="20%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        تفاصيل السلع او الخدمات<br/>Description
+                                    </th>
+                                    <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        سعر الوحدة<br/>Unit Price
+                                    </th>
+                                    <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        الكمية<br/>Quantity
+                                    </th>
+                                    <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        الوحدة<br/>Unit
+                                    </th>
+                                    <th width="12%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        المبلغ مع الضريبة<br/>Taxable Amt.
+                                    </th>
+                                    <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        خصومات<br/>Discount
+                                    </th>
+                                    <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        نسبة الضريبة<br/>Tax Rate
+                                    </th>
+                                    <th width="10%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        مبلغ الضريبة<br/>Tax Amount
+                                    </th>
+                                    <th width="16%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                        <span style="direction: rtl;">الإجمالي (مع الضريبة) </span>
+                                        <br/>Subtotal (With VAT)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="doc.invoice_line_ids.sorted(key=lambda l: l.sequence)" t-as="l">
+
+                                    <t t-if="l.display_type == 'line_note' or l.display_type == 'line_section'">
+                                        <tr>
+                                            <td colspan="10" style="padding: 10px 5px; font-weight:bold; border-bottom: 1px solid #ccc;">
+                                                <span t-field="l.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <t t-else="">
+                                        <t t-if="not l.product_id.discount_product">
+                                            <tr>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="i"/></td>
+                                                <td class="text-left" style="padding: 5px;"><span t-field="l.name"/></td>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.price_unit)"/></td>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.quantity)"/></td>
+                                                <td class="text-center" style="padding: 5px;"><span t-field="l.product_uom_id.name"/></td>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.price_before_discount)"/></td>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.discount_amount)"/></td>
+                                                <td class="text-center" style="padding: 5px;">
+                                                    <span t-esc="', '.join(map(lambda x: (str(x.amount)), l.tax_ids))"/>%
+                                                </td>
+                                                <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.tax_amount)"/></td>
+                                                <td class="text-right" style="padding: 5px;text-align: right;"><span t-esc="'{:,.2f}'.format(l.price_total)"/></td>
+                                            </tr>
+                                            <t t-set="i" t-value="i+1"/>
+                                        </t>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <table width="100%" style="padding: 0 2em 1em 0;" class="table-borderless">
+                            <tr>
+                                <th colspan="2" class="text-left" style="padding: 5px;background-color:#8e9091!important;color:white">
+                                    Total Amounts:
+                                </th>
+                                <th colspan="2" class="text-right" style="padding: 5px;background-color:#8e9091!important;color:white;text-align: right;">
+                                    :المبالغ الإجمالية
+                                </th>
+                            </tr>
+                            <tr>
+                                <td rowspan="5" width="50%">
+                                    Amount Invoiced : <span class="text-left text-uppercase" t-field="doc.amount_text"/> <br/>
+                                    <span t-field="doc.amount_in_ar"/> : قيمه الفاتوره
+                                </td>
+                                <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">Total ( Excluded VAT)</t>
+                                    <t t-if="doc.move_type == 'out_refund'">Total Returned (excluding VAT)</t>
+                                </td>
+                                <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">الإجمالي (غير شاملة ضريبة القيمة
+                                        المضافة)
+                                    </t>
+                                    <t t-if="doc.move_type == 'out_refund'">إجمالي المرتجع (باستثناء ضريبة
+                                        القيمة المضافة)
+                                    </t>
+                                </td>
+                                <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
+                                    <span t-field="doc.amount_untaxed"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
+                                    Discount
+                                </td>
+                                <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
+                                    مجموع الخصومات
+                                </td>
+                                <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
+                                    <span t-field="doc.discount"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">Total Taxable Amount</t>
+                                    <t t-if="doc.move_type == 'out_refund'">Total Returned Taxable Amount</t>
+                                </td>
+                                <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">الإجمالي الخاضع للضريبة (غير شاملة
+                                        ضريبة القيمة المضافة)
+                                    </t>
+                                    <t t-if="doc.move_type == 'out_refund'">إجمالي المرتجع الخاضع لضريبة القيمة
+                                        المضافة
+                                    </t>
+                                </td>
+                                <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
+                                    <span t-field="doc.amount_untaxed"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
+                                    Total VAT
+                                </td>
+                                <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
+                                    مجموع ضريبة القيمة المضافة
+                                </td>
+                                <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
+                                    <span t-field="doc.amount_tax"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">Total Amount Due</t>
+                                    <t t-if="doc.move_type == 'out_refund'">Total Amount to be Returned</t>
+                                </td>
+                                <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
+                                    <t t-if="doc.move_type == 'out_invoice'">إجمالي المبلغ المستحق</t>
+                                    <t t-if="doc.move_type == 'out_refund'">إجمالي المبلغ المرتجع</t>
+                                </td>
+                                <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
+                                    <span t-field="doc.amount_total"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="height:5px;"></div>
+                        <t t-if="doc.payment_reference">
+                            <table class="table-borderless" width="100%" style="border-collapse:collapse; margin-bottom:5px;">
+                                <tr>
+                                    <td style="padding: 5px; font-size:11px;">
+                                        <strong>Payment Reference / رقم إشارة الدفعة :</strong><span t-field="doc.payment_reference"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
+                        <!-- Payment Terms -->
+                        <t t-if="doc.invoice_payment_term_id">
+                            <table class="table-borderless" width="100%" style="border-collapse:collapse; margin-bottom:5px;">
+                                <tr>
+                                    <td style="padding: 5px; font-size:11px;">
+                                        <strong>Payment Terms/شروط الدفع <br></br></strong><span t-field="doc.invoice_payment_term_id"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
+                        <div style="height:15px;"></div>
+                        <table class="table-borderless" width="100%" style="border-spacing: 1em .5em;padding: 1px;border: 1px solid white;table-layout:fixed;border-collapse:collapse;">
+                            <tr>
+                                <td width="45%"
+                                    style="padding:8px;
+                                           border:1px solid black;
+                                           vertical-align:top;
+                                           line-height:22px;"
+                                    class="text-left">
+                                    <strong style="font-size:13px;">
+                                        Bank Details / تفاصيل البنك
+                                    </strong>
+                                    <br/>
+                                    <br/>
+                                    <strong>Bank / البنك</strong>
+                                    <span style="float:right;">: Al Rajhi Bank</span>
+                                    <br/>
+                                    <strong>Account Number / رقم الحساب</strong>
+                                    <span style="float:right;">
+                                        : 452000010006080097643
+                                    </span>
+                                    <br/>
+                                    <strong>IBAN / الآيبان</strong>
+                                    <span style="float:right;">
+                                        : SA3280000452608010097643
+                                    </span>
+                                </td>
+<!--                                <td style="padding:1px;border-top: 1px solid white;text-align: center;vertical-align: bottom;">-->
+<!--                                    <b>-->
+<!--                                        <u>APPROVED BY</u>-->
+<!--                                        <br/>-->
+<!--                                        <br/>-->
+<!--                                        Date / Sign-->
+<!--                                    </b>-->
+<!--                                </td>-->
+<!--                                <td style="padding:1px;border-top: 1px solid white;text-align: center;vertical-align: bottom;">-->
+<!--                                    <b>-->
+<!--                                        <u>RECEIVED BY</u>-->
+<!--                                        <br/>-->
+<!--                                        <br/>-->
+<!--                                        Date / Sign / Stamp-->
+<!--                                    </b>-->
+<!--                                </td>-->
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- FIXED REPEATING FOOTER -->
+                    <div class="footer">
+                        <div style="text-align: center; width: 100%;">
+                            <t t-if="o.company_id.footer_img">
+                                <img t-attf-src="/web/image/res.company/{{ o.company_id.id }}/footer_img"
+                                     style="width:100%; height:auto; max-height:80px;"/>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
