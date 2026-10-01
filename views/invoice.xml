@@ -25,7 +25,7 @@
             <xpath expr="//field[@name='invoice_payment_term_id']" position="after">
                 <field name="invoice_type"/>
                 <field name="receipt_number"/>
-                <field name="contract_no"/>
+                <field name="contract_no" placeholder="PO Number"/>
                 <field name="job_number"/>
             </xpath>
             <xpath expr="//field[@name='user_id']" position="after">

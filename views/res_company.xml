@@ -14,27 +14,27 @@
                     <field name="footer_img"/>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position="after">
-                    <field name="arabic_vat"/>
+<!--                    <field name="arabic_vat"/>-->
                     <field name="district"/>
                     <field name="additional_no"/>
                 </xpath>
-                <xpath expr="//notebook" position="inside">
-                    <page string="Arabic Company Details">
-                        <group>
-                            <group>
-                                <label for="street_arabic" string="Address"/>
-                                <div class="o_address_format">
-                                    <field name="street_arabic" placeholder="شارع..." class="o_address_street"/>
-                                    <field name="street2_arabic" placeholder="شارع 2..." class="o_address_street"/>
-                                    <field name="city_arabic" placeholder="مدينة" class="o_address_city"/>
-                                    <field name="state_arabic" placeholder="حالة"/>
-                                    <field name="zip_arabic" placeholder="أزيز" class="o_address_zip"/>
-                                    <field name="country_arabic" placeholder="بلد"/>
-                                </div>
-                            </group>
-                        </group>
-                    </page>
-                </xpath>
+<!--                <xpath expr="//notebook" position="inside">-->
+<!--                    <page string="Arabic Company Details">-->
+<!--                        <group>-->
+<!--                            <group>-->
+<!--                                <label for="street_arabic" string="Address"/>-->
+<!--                                <div class="o_address_format">-->
+<!--                                    <field name="street_arabic" placeholder="شارع..." class="o_address_street"/>-->
+<!--                                    <field name="street2_arabic" placeholder="شارع 2..." class="o_address_street"/>-->
+<!--                                    <field name="city_arabic" placeholder="مدينة" class="o_address_city"/>-->
+<!--                                    <field name="state_arabic" placeholder="حالة"/>-->
+<!--                                    <field name="zip_arabic" placeholder="أزيز" class="o_address_zip"/>-->
+<!--                                    <field name="country_arabic" placeholder="بلد"/>-->
+<!--                                </div>-->
+<!--                            </group>-->
+<!--                        </group>-->
+<!--                    </page>-->
+<!--                </xpath>-->
             </field>
         </record>
         <record id="view_account_journal_form_inherited" model="ir.ui.view">
