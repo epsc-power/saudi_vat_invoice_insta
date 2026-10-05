@@ -13,15 +13,6 @@
         <field name="header_spacing">2</field>  <!-- must match margin_top -->
         <field name="dpi">90</field>
     </record>
-<!--    <report-->
-<!--            id="account_invoices"-->
-<!--            model="account.move"-->
-<!--            string="Saudi E-Invoice (B2B)"-->
-<!--            report_type="qweb-pdf"-->
-<!--            name="saudi_vat_invoice_insta.report_saudi_invoice_pdt"-->
-<!--            file="saudi_vat_invoice_insta.report_saudi_invoice_pdt"-->
-<!--            paperformat="saudi_vat_invoice_insta.paperformat_vat_b2b"-->
-<!--    />-->
     <record id="report_saudi_invoice" model="ir.actions.report">
         <field name="name">Saudi Invoice Print</field>
         <field name="model">account.move</field>
@@ -245,14 +236,11 @@
                                 <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
                                     الوحدة<br/>Unit
                                 </th>
-                                <th width="12%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
-                                    المبلغ مع الضريبة<br/>Taxable Amt.
-                                </th>
-                                <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
-                                    خصومات<br/>Discount
-                                </th>
                                 <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
                                     نسبة الضريبة<br/>Tax Rate
+                                </th>
+                                <th width="12%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
+                                    المبلغ مع الضريبة<br/>Taxable Amt.
                                 </th>
                                 <th width="10%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
                                     مبلغ الضريبة<br/>Tax Amount
@@ -283,12 +271,17 @@
                                             <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.price_unit)"/></td>
                                             <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.quantity)"/></td>
                                             <td class="text-center" style="padding: 5px;"><span t-field="l.product_uom_id.name"/></td>
-                                            <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.price_before_discount)"/></td>
-                                            <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.discount_amount)"/></td>
                                             <td class="text-center" style="padding: 5px;">
                                                 <span t-esc="', '.join(map(lambda x: (str(x.amount)), l.tax_ids))"/>%
                                             </td>
-                                            <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.tax_amount)"/></td>
+                                            <!-- FIXED: Use native Odoo 'price_subtotal' instead of broken python compute -->
+                                            <td class="text-center" style="padding: 5px;">
+                                                <span t-esc="'{:,.2f}'.format(l.price_subtotal)"/>
+                                            </td>
+
+                                            <td class="text-center" style="padding: 5px;">
+                                                <span t-esc="'{:,.2f}'.format(l.price_total - l.price_subtotal)"/>
+                                            </td>
                                             <td class="text-right" style="padding: 5px;text-align: right;"><span t-esc="'{:,.2f}'.format(l.price_total)"/></td>
                                         </tr>
                                         <t t-set="i" t-value="i+1"/>
@@ -339,23 +332,23 @@
                                 <span t-field="doc.discount"/>
                             </td>
                         </tr>
-                        <tr>
-                            <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
-                                <t t-if="doc.move_type == 'out_invoice'">Total Taxable Amount</t>
-                                <t t-if="doc.move_type == 'out_refund'">Total Returned Taxable Amount</t>
-                            </td>
-                            <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">
-                                <t t-if="doc.move_type == 'out_invoice'">الإجمالي الخاضع للضريبة (غير شاملة
-                                    ضريبة القيمة المضافة)
-                                </t>
-                                <t t-if="doc.move_type == 'out_refund'">إجمالي المرتجع الخاضع لضريبة القيمة
-                                    المضافة
-                                </t>
-                            </td>
-                            <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">
-                                <span t-field="doc.amount_untaxed"/>
-                            </td>
-                        </tr>
+<!--                        <tr>-->
+<!--                            <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">-->
+<!--                                <t t-if="doc.move_type == 'out_invoice'">Total Taxable Amount</t>-->
+<!--                                <t t-if="doc.move_type == 'out_refund'">Total Returned Taxable Amount</t>-->
+<!--                            </td>-->
+<!--                            <td width="18%" class="text-right" style="font-size: 11px;padding: 5px;direction: rtl; border: 1px solid #ccc;">-->
+<!--                                <t t-if="doc.move_type == 'out_invoice'">الإجمالي الخاضع للضريبة (غير شاملة-->
+<!--                                    ضريبة القيمة المضافة)-->
+<!--                                </t>-->
+<!--                                <t t-if="doc.move_type == 'out_refund'">إجمالي المرتجع الخاضع لضريبة القيمة-->
+<!--                                    المضافة-->
+<!--                                </t>-->
+<!--                            </td>-->
+<!--                            <td class="text-right" style="padding: 5px;text-align: right; border: 1px solid #ccc;">-->
+<!--                                <span t-field="doc.amount_untaxed"/>-->
+<!--                            </td>-->
+<!--                        </tr>-->
                         <tr>
                             <td width="18%" class="text-left" style="font-size: 11px;padding: 5px; border: 1px solid #ccc;">
                                 Total VAT
@@ -385,8 +378,11 @@
                     <t t-if="doc.payment_reference">
                         <table class="table-borderless" width="100%" style="border-collapse:collapse; margin-bottom:5px;">
                             <tr>
-                                <td style="padding: 5px; font-size:11px;">
-                                    <strong>Payment Reference / رقم إشارة الدفعة :</strong><span t-field="doc.payment_reference"/>
+                                <td style="padding: 5px; font-size:11px; width: 35%;">
+                                    <strong>Payment Reference / رقم إشارة الدفعة :</strong>
+                                </td>
+                                <td style="padding: 5px; font-size:11px; text-align: left;">
+                                    <span t-field="doc.payment_reference" dir="ltr"/>
                                 </td>
                             </tr>
                         </table>
@@ -416,34 +412,21 @@
                                 <br/>
                                 <br/>
                                 <strong>Bank / البنك</strong>
-                                <span style="float:right;">: Al Rajhi Bank</span>
+                                <span style="float:right;">: <span t-field="doc.company_id.bank_name_en"/></span>
                                 <br/>
                                 <strong>Account Number / رقم الحساب</strong>
-                                <span style="float:right;">
-                                    : 452000010006080097643
+                                <span style="float:right;">:
+                                    <span t-field="doc.company_id.account_number"/>
                                 </span>
                                 <br/>
-                                <strong>IBAN / الآيبان</strong>
-                                <span style="float:right;">
-                                    : SA3280000452608010097643
+                                <strong>IBAN No. / رقم الآيبان</strong>
+                                <span style="float:right;">:
+                                    <span t-field="doc.company_id.bank_iban"/>
                                 </span>
+                                <br/>
+                                <strong>SWIFT Code / رمز سويفت</strong>
+                                <span style="float:right;">: <span t-field="doc.company_id.bank_swift"/></span>
                             </td>
-<!--                                <td style="padding:1px;border-top: 1px solid white;text-align: center;vertical-align: bottom;">-->
-<!--                                    <b>-->
-<!--                                        <u>APPROVED BY</u>-->
-<!--                                        <br/>-->
-<!--                                        <br/>-->
-<!--                                        Date / Sign-->
-<!--                                    </b>-->
-<!--                                </td>-->
-<!--                                <td style="padding:1px;border-top: 1px solid white;text-align: center;vertical-align: bottom;">-->
-<!--                                    <b>-->
-<!--                                        <u>RECEIVED BY</u>-->
-<!--                                        <br/>-->
-<!--                                        <br/>-->
-<!--                                        Date / Sign / Stamp-->
-<!--                                    </b>-->
-<!--                                </td>-->
                         </tr>
                     </table>
                 </div>

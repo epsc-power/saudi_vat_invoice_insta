@@ -8,21 +8,9 @@ class inherit_res_company(models.Model):
     header_img = fields.Binary("Header Image")
     footer_img = fields.Binary("Footer Image")
     arabic = fields.Char('اسم')
-    # arabic_vat = fields.Char('ضريبة القيمة المضافة')
-    # street_arabic = fields.Char('شارع')
-    # street2_arabic = fields.Char('شارع 2')
-    # city_arabic = fields.Char('مدينة')
-    # state_arabic = fields.Char('حالة')
-    # zip_arabic = fields.Char('أزيز')
-    # country_arabic = fields.Char('بلد')
-    district = fields.Char(
-        'District'
-    )
-    additional_no = fields.Char(
-        'Additional No.'
-    )
-
-
+    district = fields.Char('District')
+    additional_no = fields.Char('Additional No.')
+    account_number = fields.Char(string="Account Number")
 
 class Journal(models.Model):
     _inherit= 'account.journal'
