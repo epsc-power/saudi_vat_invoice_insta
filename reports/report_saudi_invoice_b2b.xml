@@ -40,7 +40,7 @@
                  style="width:100%; height:auto; max-height:120px; display:block;"/>
                     </t>
                 </div>
-                <div class="page" style="font-family: 'Cairo';font-size: 11px; !important">
+                <div class="page" style="font-family: 'Noto Sans Arabic', 'DejaVu Sans', sans-serif; font-size: 11px !important;">
                     <div class="row">
                     <!-- LEFT: Invoice Number, Invoice Date, Delivery Date -->
                     <div class="col-4">
@@ -234,19 +234,17 @@
                                     الكمية<br/>Quantity
                                 </th>
                                 <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
-                                    الوحدة<br/>Unit
-                                </th>
-                                <th width="8%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
                                     نسبة الضريبة<br/>Tax Rate
                                 </th>
                                 <th width="12%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
-                                    المبلغ مع الضريبة<br/>Taxable Amt.
+                                    المبلغ قبل الضريبة<br/>Taxable Amt.
                                 </th>
                                 <th width="10%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
                                     مبلغ الضريبة<br/>Tax Amount
                                 </th>
                                 <th width="16%" class="text-center" style="font-size: 11px;padding: 5px;background-color: #8e9091;color:white">
-                                    <span style="direction: rtl;">الإجمالي (مع الضريبة) </span>
+                                    <!-- Replaced &rlm; with the numeric Unicode &#x200F; -->
+                                    <span dir="rtl">الإجمالي (مع الضريبة)&#x200F;</span>
                                     <br/>Subtotal (With VAT)
                                 </th>
                             </tr>
@@ -270,7 +268,6 @@
                                             <td class="text-left" style="padding: 5px;"><span t-field="l.name"/></td>
                                             <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.price_unit)"/></td>
                                             <td class="text-center" style="padding: 5px;"><span t-esc="'{:,.2f}'.format(l.quantity)"/></td>
-                                            <td class="text-center" style="padding: 5px;"><span t-field="l.product_uom_id.name"/></td>
                                             <td class="text-center" style="padding: 5px;">
                                                 <span t-esc="', '.join(map(lambda x: (str(x.amount)), l.tax_ids))"/>%
                                             </td>
