@@ -31,7 +31,7 @@
         </t>
     </template>
     <template id="report_saudi_invoice_print_b2b">
-        <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
             <t t-set="o" t-value="doc"/>
             <t t-call="saudi_vat_invoice_insta.external_layout_vat">
                 <div style="width:100%; text-align:center; margin-bottom:8px;">
@@ -40,7 +40,7 @@
                  style="width:100%; height:auto; max-height:120px; display:block;"/>
                     </t>
                 </div>
-                <div class="page" style="font-family: 'Noto Sans Arabic', 'DejaVu Sans', sans-serif; font-size: 11px !important;">
+                <div class="page" style="font-family: Arial, sans-serif; font-size: 11px !important;">
                     <div class="row">
                     <!-- LEFT: Invoice Number, Invoice Date, Delivery Date -->
                     <div class="col-4">
