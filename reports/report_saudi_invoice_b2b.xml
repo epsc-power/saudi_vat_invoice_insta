@@ -31,7 +31,7 @@
         </t>
     </template>
     <template id="report_saudi_invoice_print_b2b">
-        <t t-call="web.basic_layout">
+        <t t-call="web.html_container">
             <t t-set="o" t-value="doc"/>
             <t t-call="saudi_vat_invoice_insta.external_layout_vat">
                 <div style="width:100%; text-align:center; margin-bottom:8px;">
