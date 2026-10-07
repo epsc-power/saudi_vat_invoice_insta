@@ -40,7 +40,7 @@
                  style="width:100%; height:auto; max-height:120px; display:block;"/>
                     </t>
                 </div>
-                <div class="page" style="font-family: Arial, sans-serif !important; font-size: 30px !important;">
+                <div class="page" style="font-family: Arial, sans-serif !important; font-size: 12px !important;">
                     <div class="row">
                     <!-- LEFT: Invoice Number, Invoice Date, Delivery Date -->
                     <div class="col-4">
