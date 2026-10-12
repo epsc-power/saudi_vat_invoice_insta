@@ -14,6 +14,11 @@
         "reports/report_saudi_invoice.xml",
         "reports/report_saudi_invoice_b2b.xml",
     ],
+    "assets": {
+        "web.report_assets_common": [
+            "saudi_vat_invoice_insta/static/src/scss/reports.scss",
+        ],
+    },
     "license": "LGPL-3",
     "installable": True,
     "application": False,

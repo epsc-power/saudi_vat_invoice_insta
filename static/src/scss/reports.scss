@@ -1,8 +1,14 @@
 @font-face {
-    font-family: ANefelSereke;
-    src: url(/saudi_vat_invoice_insta/static/src/fonts/A_Nefel_Sereke.ttf);
+    font-family: Cairo;
+    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Regular.ttf);
+    font-weight: normal;
 }
 @font-face {
     font-family: Cairo;
-    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Regular.ttf);
+    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Black.ttf);
+    font-weight: bold;
+}
+.page, .page * {
+    font-family: Cairo, Tahoma, Arial, sans-serif !important;
+    letter-spacing: normal !important;
 }
