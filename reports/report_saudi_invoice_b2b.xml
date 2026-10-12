@@ -396,34 +396,32 @@
                         </table>
                     </t>
                     <div style="height:15px;"></div>
-                    <table class="table-borderless" width="100%" style="border-spacing: 1em .5em;padding: 1px;border: 1px solid white;table-layout:fixed;border-collapse:collapse;">
+                    <table class="table-borderless" width="100%" style="border-collapse:collapse; table-layout:fixed;">
                         <tr>
-                            <td width="45%"
-                                style="padding:8px;
-                                       border:1px solid black;
-                                       vertical-align:top;
-                                       line-height:22px;"
-                                class="text-left">
-                                <strong style="font-size:13px;">
-                                    Bank Details / تفاصيل البنك
-                                </strong>
-                                <br/>
-                                <br/>
-                                <strong>Bank / البنك</strong>
-                                <span style="float:right;">: <span t-field="doc.company_id.bank_name_en"/></span>
-                                <br/>
-                                <strong>Account Number / رقم الحساب</strong>
-                                <span style="float:right;">:
-                                    <span t-field="doc.company_id.account_number"/>
-                                </span>
-                                <br/>
-                                <strong>IBAN No. / رقم الآيبان</strong>
-                                <span style="float:right;">:
-                                    <span t-field="doc.company_id.bank_iban"/>
-                                </span>
-                                <br/>
-                                <strong>SWIFT Code / رمز سويفت</strong>
-                                <span style="float:right;">: <span t-field="doc.company_id.bank_swift"/></span>
+                            <td width="45%" style="padding:8px; border:1px solid black; vertical-align:top;">
+                                <table width="100%" style="border-collapse:collapse; table-layout:fixed;">
+                                    <tr>
+                                        <td colspan="2" style="padding:3px 0; font-size:13px;">
+                                            <strong>Bank Details / تفاصيل البنك</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:55%; padding:3px 0;"><strong>Bank / البنك</strong></td>
+                                        <td style="padding:3px 0;">: <span t-field="doc.company_id.bank_name_en"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:3px 0;"><strong>Account Number / رقم الحساب</strong></td>
+                                        <td style="padding:3px 0;">: <span t-field="doc.company_id.account_number"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:3px 0;"><strong>IBAN No. / رقم الآيبان</strong></td>
+                                        <td style="padding:3px 0;">: <span t-field="doc.company_id.bank_iban"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:3px 0;"><strong>SWIFT Code / رمز سويفت</strong></td>
+                                        <td style="padding:3px 0;">: <span t-field="doc.company_id.bank_swift"/></td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </table>
