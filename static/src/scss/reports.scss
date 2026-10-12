@@ -1,14 +1,17 @@
 @font-face {
-    font-family: Cairo;
-    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Regular.ttf);
+    font-family: 'CairoInv';
+    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Regular.ttf) format('truetype');
     font-weight: normal;
+    font-style: normal;
 }
 @font-face {
-    font-family: Cairo;
-    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-Black.ttf);
+    font-family: 'CairoInv';
+    src: url(/saudi_vat_invoice_insta/static/src/fonts/Cairo-SemiBold.ttf) format('truetype');
     font-weight: bold;
+    font-style: normal;
 }
-.page, .page * {
-    font-family: Cairo, Tahoma, Arial, sans-serif !important;
+
+.page, .page *, .footer, .footer * {
+    font-family: 'CairoInv', Tahoma, Arial, sans-serif !important;
     letter-spacing: normal !important;
 }
