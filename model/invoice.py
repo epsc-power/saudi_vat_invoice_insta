@@ -251,3 +251,4 @@ class AccountTax(models.Model):
     _inherit = 'account.tax'
 
     amount_in_arabic = fields.Float('Amount in Arabic')
+    
