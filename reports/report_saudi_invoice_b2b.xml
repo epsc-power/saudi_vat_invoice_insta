@@ -182,7 +182,7 @@
                                     <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: center;"><span t-field="doc.company_id.district"/></td>
                                     <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid black; text-align: right;">: المنطقة</td>
                                     <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">District :</td>
-                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.district"/></td>
+                                    <td style="padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; text-align: center;"><span t-field="doc.partner_id.state_id.name"/></td>
                                     <td style="padding: 5px; border-bottom: 1px solid #ccc; text-align: right;">: المنطقة</td>
                                 </tr>
                                 <tr>
