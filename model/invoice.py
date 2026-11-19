@@ -12,75 +12,71 @@ import base64
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.move.line'
 
-    tax_amount = fields.Monetary('Tax amount', compute='_compute_price', store=True)
-    vat_text = fields.Char('Vat Text', compute='_get_vat_text', store=True)
-    discount_amount = fields.Float('Discount Amount', compute='_compute_price', store=True)
-    price_before_discount = fields.Monetary('Price B/f Disc', compute='_compute_price', store=True)
-    price_total = fields.Monetary('Price Total', compute='_compute_price', store=True)
+    tax_amount = fields.Monetary(
+        string='Tax Amount',
+        compute='_compute_saudi_values',
+        store=True,
+        currency_field='currency_id',
+    )
+
+    vat_text = fields.Char(
+        string='VAT Text',
+        compute='_get_vat_text',
+        store=True,
+    )
+
+    discount_amount = fields.Monetary(
+        string='Discount Amount',
+        compute='_compute_saudi_values',
+        store=True,
+        currency_field='currency_id',
+    )
+
+    price_before_discount = fields.Monetary(
+        string='Price Before Discount',
+        compute='_compute_saudi_values',
+        store=True,
+        currency_field='currency_id',
+    )
 
     @api.depends('tax_ids', 'price_unit', 'quantity')
     def _get_vat_text(self):
-        vat = ''
         for line in self:
-            for tax in line.tax_ids:
-                vat += str(tax.amount) + '%,'
-            line.vat_text = vat[:-1]
+            if line.display_type:
+                line.vat_text = False
+                continue
 
-    @api.depends('price_unit', 'discount', 'tax_ids', 'quantity',
-                 'product_id', 'move_id.partner_id', 'move_id.currency_id', 'move_id.company_id',
-                 'move_id.invoice_date', 'move_id.date')
-    def _compute_price(self):
+            vat_rates = [
+                str(tax.amount)
+                for tax in line.tax_ids
+            ]
+
+            line.vat_text = ','.join(vat_rates) if vat_rates else ''
+
+    @api.depends('price_unit','quantity','discount','price_subtotal','price_total')
+    def _compute_saudi_values(self):
         for line in self:
-            # Handle Notes and Sections explicitly
             if line.display_type:
                 line.tax_amount = 0
-                line.price_total = 0
-                line.price_subtotal = 0
                 line.price_before_discount = 0
                 line.discount_amount = 0
                 continue
 
-            currency = line.move_id.currency_id
-            # Calculate base price
-            price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            # Original line value before discount
+            line.price_before_discount = (
+                line.quantity * line.price_unit
+            )
 
-            # Calculate Taxes
-            taxes = False
-            if line.tax_ids:
-                taxes = line.tax_ids.compute_all(
-                    price, currency, line.quantity,
-                    product=line.product_id, partner=line.move_id.partner_id
-                )
+            # Discount amount
+            line.discount_amount = (
+                line.price_before_discount *
+                (line.discount or 0.0) / 100.0
+            )
 
-            # Subtotal Calculation
-            subtotal = taxes['total_excluded'] if taxes else line.quantity * price
-
-            # Currency Conversion
-            if currency and line.move_id.company_id and currency != line.move_id.company_id.currency_id:
-                subtotal = currency.with_context(
-                    date=line.move_id._get_currency_rate_date()
-                ).compute(subtotal, line.move_id.company_id.currency_id)
-
-            sign = -1 if line.move_id.move_type in ['in_refund', 'out_refund'] else 1
-
-            # Assignment
-            line.price_subtotal = subtotal * sign
-
-            if taxes:
-                line.tax_amount = (taxes['total_included'] - taxes['total_excluded']) * sign
-                line.price_total = taxes['total_included'] * sign
-            else:
-                line.tax_amount = 0
-                line.price_total = subtotal * sign
-
-            # Discount Calculation
-            line.price_before_discount = line.quantity * line.price_unit
-            line.discount_amount = (line.price_before_discount * line.discount) / 100.0
-
-    # @api.depends('price_unit','quantity','price_subtotal')
-    # def _compute_tax_amount(self):
-    #     for line in self:
-    #         line.tax_amount = line.price_total - line.price_subtotal
+            # VAT amount
+            line.tax_amount = (
+                line.price_total - line.price_subtotal
+            )
 
 
 class AccountInvoice(models.Model):
